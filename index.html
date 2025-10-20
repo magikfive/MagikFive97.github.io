@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
+  <title>Real — Carta de Cafés del Mundo</title>
+  <style>
+    :root {
+      --bg: #1e1612;
+      --accent: #D4A373;
+      --cream: #FFF8E7;
+      --muted: #C1A089;
+      --card: #2b1b12;
+      --glass: rgba(255,255,255,0.04);
+      --radius: 18px;
+      --maxw: 1200px;
+      --pad: 20px;
+      --touch: 14px;
+      font-size: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body, #app {
+      height: 100%;
+      background: linear-gradient(180deg, var(--bg), #160f0c);
+      color: var(--cream);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      overflow: hidden;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      padding: 14px var(--pad);
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      backdrop-filter: blur(4px);
+      position: relative;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #2e1d15, #5a3b2b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-family: "Playfair Display", serif;
+      font-size: 22px;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+      margin: 0;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* screens */
+    .screen {
+      height: calc(100% - 84px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* globe */
+    .globe-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .globe {
+      width: 86vmin;
+      height: 86vmin;
+      max-width: 680px;
+      max-height: 680px;
+      background: 
+        radial-gradient(circle at 35% 25%, rgba(212,163,115,0.06), transparent 10%),
+        radial-gradient(circle at 70% 70%, rgba(255,255,255,0.02), transparent 10%),
+        url('img/globe-texture.jpg') center/192%,
+        linear-gradient(135deg, rgba(30,22,18,0.8), rgba(60,40,30,0.4));
+        
+      border-radius: 50%;
+      position: relative;
+      box-shadow: 
+        0 20px 60px rgba(0,0,0,0.6), 
+        inset 0 8px 30px rgba(255,255,255,0.02);
+      overflow: visible;
+      animation: slow-rotate 40s linear infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.04);
+      
+    }
+
+    /* subtle rings */
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .ring-1 {
+      width: 92%;
+      height: 92%;
+      border: 1px dashed rgba(255,255,255,0.02);
+    }
+
+    .ring-2 {
+      width: 76%;
+      height: 76%;
+      border: 1px solid rgba(212,163,115,0.03);
+    }
+
+    /* country node */
+    .node {
+      position: absolute;
+      width: 92px;
+      height: 92px;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.08));
+      box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      border: 1px solid rgba(255,255,255,0.04);
+      z-index: 5;
+    }
+
+    .node:hover {
+      transform: translate(-50%, -50%) scale(1.08);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.6);
+    }
+
+    .node .node-img {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-bottom: 6px;
+      background-color: rgba(0,0,0,0.2);
+    }
+
+    .node h4 {
+      margin: 0;
+      font-size: 13px;
+      color: var(--cream);
+      text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+    }
+
+    /* hint & footer */
+    .hint {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      background: linear-gradient(180deg, var(--accent), #b88357);
+      color: #111;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.5);
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.6);
+    }
+
+    .btn.small {
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 10px;
+    }
+
+    .btn.back {
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      background: transparent;
+      color: var(--cream);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 8px 12px;
+      border-radius: 10px;
+      z-index: 10;
+    }
+
+    /* detail card */
+    .detail-card {
+      width: 90%;
+      max-width: 1100px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
+      border-radius: 20px;
+      padding: 22px;
+      display: flex;
+      gap: 20px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+      align-items: center;
+      border: 1px solid transparent;
+      transition: border-color 0.3s ease;
+    }
+
+    .detail-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .detail-right {
+      flex: 1.2;
+      text-align: left;
+    }
+
+    .country-img {
+      width: 220px;
+      height: 160px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid rgba(255,255,255,0.04);
+      background-color: rgba(0,0,0,0.2);
+    }
+
+    .detail-right h2 {
+      margin: 0;
+      font-size: 28px;
+      font-family: "Playfair Display", serif;
+    }
+
+    .detail-right h3 {
+      margin: 6px 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .detail-right p {
+      line-height: 1.45;
+      color: var(--cream);
+      margin: 10px 0;
+    }
+
+    /* cup + steam animation */
+    .cup-anim {
+      width: 220px;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cup {
+      width: 120px;
+      height: 80px;
+      border-radius: 12px 12px 20px 20px;
+      background: linear-gradient(180deg, #fff, #f2e7d9);
+      position: relative;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    .cup::after {
+      content: '';
+      position: absolute;
+      right: -22px;
+      top: 24px;
+      width: 38px;
+      height: 18px;
+      border-radius: 50px;
+      border: 8px solid rgba(255,255,255,0.06);
+      transform: rotate(-12deg);
+    }
+
+    .steam {
+      position: absolute;
+      left: 26px;
+      top: -42px;
+      width: 70px;
+      height: 120px;
+    }
+
+    .steam::before, .steam::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 40px;
+      border-radius: 50%;
+      left: 18px;
+      opacity: 0.14;
+      background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.02));
+      animation: steamRise 3.5s infinite ease-in-out;
+    }
+
+    .steam::after {
+      left: 36px;
+      height: 52px;
+      animation-delay: 0.8s;
+      opacity: 0.12;
+    }
+
+    /* utility */
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .credits {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Tarjeta de detalle mejorada */
+.media-container {
+  position: relative;
+  width: 220px;
+  height: 160px;
+}
+
+.country-video {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.coffee-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.flag {
+  width: 32px;
+  height: 24px;
+  border-radius: 4px;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.detail-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.detail-icon {
+  font-size: 20px;
+  margin-top: 2px;
+}
+
+.detail-item div {
+  flex: 1;
+}
+
+.detail-item strong {
+  color: var(--accent);
+  font-size: 14px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.detail-item p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+    /* animations */
+    @keyframes slow-rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(90deg); }
+    }
+
+    @keyframes steamRise {
+      0% { transform: translateY(20px) scale(.8); opacity: 0; }
+      30% { opacity: 0.12; }
+      70% { opacity: 0.02; }
+      100% { transform: translateY(-60px) scale(1.05); opacity: 0; }
+    }
+
+    /* responsive tweaks for tablets */
+    @media (max-width: 900px) {
+      .detail-card {
+        flex-direction: column;
+        padding: 16px;
+      }
+      .country-img {
+        width: 70%;
+        height: auto;
+      }
+      .globe {
+        width: 92vmin;
+        height: 92vmin;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main id="app">
+    <!-- Header / título -->
+    <header class="top">
+      <div class="brand">
+        <div class="logo">☕</div>
+        <div>
+          <h1>Real</h1>
+          <p class="subtitle">Carta de Cafés del Mundo</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Pantalla principal: globo -->
+    <section id="map-screen" class="screen">
+      <div class="globe-wrap">
+        <div class="globe" id="globe">
+          <!-- decorative rings for depth -->
+          <div class="ring ring-1"></div>
+          <div class="ring ring-2"></div>
+
+          <!-- country nodes (positioned via CSS coords) -->
+          <!-- The nodes are created dynamically by JS for easier data-driven setup -->
+        </div>
+        <div class="hint">Toca un país para descubrir su café ☕</div>
+      </div>
+      <footer class="footer">
+       
+        <div class="credits">Real · Carta interactiva</div>
+      </footer>
+    </section>
+
+    <!-- Pantalla detalle -->
+    <section id="detail-screen" class="screen hidden">
+      <button id="backBtn" class="btn back">← Mapa</button>
+      <div class="detail-card" id="detailCard">
+  <div class="detail-left">
+    <div class="cup-anim">
+      <div class="cup">
+        <div class="steam" id="steam"></div>
+      </div>
+    </div>
+    <div class="media-container">
+      <img id="countryImg" src="" alt="" class="country-img">
+      <video id="countryVideo" class="country-video hidden" controls muted loop></video>
+    </div>
+  </div>
+  <div class="detail-right">
+    <div class="coffee-header">
+      <h2 id="coffeeName">Café</h2>
+      <div class="flag" id="countryFlag"></div>
+    </div>
+    <h3 id="countryName">País</h3>
+    <p id="desc">Descripción divertida y breve del café.</p>
+    
+    <div class="details-grid">
+      <div class="detail-item">
+        <span class="detail-icon">🌿</span>
+        <div>
+          <strong>Ingredientes</strong>
+          <p id="ingredients"></p>
+        </div>
+      </div>
+      <div class="detail-item">
+        <span class="detail-icon">💡</span>
+        <div>
+          <strong>Curiosidad</strong>
+          <p id="trivia"></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="actions">
+      <button id="prevBtn" class="btn small">← Anterior</button>
+      <button id="nextBtn" class="btn small">Siguiente →</button>
+    </div>
+  </div>
+</div>
+    </section>
+
+    <!-- audio element (JS will set src) -->
+    <audio id="bgAudio" preload="auto"></audio>
+  </main>
+
+  <script>
+    // Simple app.js — no frameworks, todo vanilla
+    let data = [];
+    let currentIndex = 0;
+    const audio = document.getElementById('bgAudio');
+
+    async function init() {
+      // cargar datos
+      try {
+        const res = await fetch('data.json');
+        data = await res.json();
+        renderNodes();
+        attachHandlers();
+      } catch (error) {
+        console.error('Error loading data:', error);
+        // Fallback data in case JSON fails to load
+        data = [
+          {
+            "id":"brasil",
+            "pais":"Brasil",
+            "cafe":"Café Brasileiro",
+            "descripcion":"Un café con cuerpo, ideal para acompañar la vida en la barra.",
+            "ingredientes":["Café arábica","Agua"],
+            "curiosidad":"Brasil es el mayor productor de café del mundo.",
+            "imagen":"img/brasil.png",
+            "audio":"audio/brasil.mp3",
+            "pos":{"left":"60%","top":"58%"},
+            "color":"#FFD700",
+            "bandera": "img/brasil.png"
+          },
+          {
+            "id":"España",
+            "pais":"España",
+            "cafe":"Café España",
+            "descripcion":"Un café con cuerpo, ideal para acompañar la vida en la barra.",
+            "ingredientes":["Café arábica","Agua"],
+            "curiosidad":"Brasil es el mayor productor de café del mundo.",
+            "imagen":"img/cafe_españa1.png",
+            "audio":"audio/españa.mp3",
+            "pos":{"left":"12%","top":"18%" },
+            "color":"#FFD700",
+            "bandera": "img/españa.png"
+          },
+          {
+            "id":"etiopia",
+            "pais":"Etiopía",
+            "cafe":"Buna",
+            "descripcion":"Aromático y floral, con una tradición milenaria.",
+            "ingredientes":["Café etíope","Agua"],
+            "curiosidad":"Se cree que el café se descubrió en la región de Kaffa.",
+            "imagen":"img/etiopia.png",
+            "audio":"audio/etiopia.mp3",
+            "pos":{"left":"52%","top":"40%"},
+            "color":"#8B4513",
+            "bandera": "img/etiopia.png"
+          }
+        ];
+        renderNodes();
+        attachHandlers();
+      }
+    }
+
+    // crear nodos sobre la 'globe'
+    function renderNodes(){
+      const globe = document.getElementById('globe');
+      globe.innerHTML = `
+        <div class="ring ring-1"></div>
+        <div class="ring ring-2"></div>
+      `;
+      
+      data.forEach((d, i) => {
+        const node = document.createElement('div');
+        node.className = 'node';
+        node.style.left = d.pos?.left || '50%';
+        node.style.top = d.pos?.top || '50%';
+        node.dataset.index = i;
+
+        node.innerHTML = `
+          <img class="node-img" src="${d.bandera}" alt="${d.pais}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDIiIGhlaWdodD0iNDIiIHZpZXdCb3g9IjAgMCA0MiA0MiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQyIiBoZWlnaHQ9IjQyIiByeD0iOCIgZmlsbD0iIzJGMTYxMiIvPgo8dGV4dCB4PSIyMSIgeT0iMjQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI0MxQTA4OSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+QujwvdGV4dD4KPC9zdmc+'">
+          <h4>${d.pais}</h4>
+        `;
+        
+        // small levitation effect
+        node.animate(
+          [
+            {transform: 'translate(-50%,-50%) translateY(0)'},
+            {transform: 'translate(-50%,-50%) translateY(-6px)'}
+          ],
+          {
+            duration: 1800 + (i * 80),
+            direction: 'alternate',
+            iterations: Infinity,
+            easing: 'ease-in-out'
+          }
+        );
+        
+        node.addEventListener('click', () => openDetail(i));
+        globe.appendChild(node);
+      });
+    }
+
+    // abrir detalle
+    function openDetail(index){
+      currentIndex = index;
+      const item = data[index];
+      document.getElementById('map-screen').classList.add('hidden');
+      document.getElementById('detail-screen').classList.remove('hidden');
+      populateDetail(item);
+      playAudio(item.audio);
+      // subtle background color change
+      document.getElementById('detailCard').style.borderColor = item.color || 'transparent';
+    }
+
+    // rellenar vista detalle
+    function populateDetail(item){
+      document.getElementById('coffeeName').textContent = item.cafe;
+      document.getElementById('countryName').textContent = item.pais;
+      document.getElementById('desc').textContent = item.descripcion;
+      document.getElementById('ingredients').textContent = (item.ingredientes || []).join(', ');
+      document.getElementById('trivia').textContent = item.curiosidad;
+      // Bandera
+      const flag = document.getElementById('countryFlag');
+      if (item.bandera) {
+        flag.style.backgroundImage = `url(${item.bandera})`;
+        flag.style.display = 'block';
+      } else {
+        flag.style.display = 'none';
+      }
+      
+      const countryImg = document.getElementById('countryImg');
+      countryImg.src = item.imagen;
+      countryImg.alt = `Café de ${item.pais}`;
+      
+      // animate steam (restart)
+      const steam = document.getElementById('steam');
+      steam.style.opacity = '1';
+      steam.animate(
+        [
+          {transform: 'translateY(0)'},
+          {transform: 'translateY(-20px)'}
+        ],
+        {
+          duration: 1200,
+          iterations: 1
+        }
+      );
+    }
+
+    // audio play (safe fallback)
+    function playAudio(src){
+      if(!src) return;
+      try {
+        audio.pause();
+        audio.src = src;
+        audio.currentTime = 0;
+        audio.volume = 0.32;
+        audio.loop = true;
+        audio.play().catch(e => {
+          // autoplay might be blocked on some tablets; quiet fail
+          console.warn('Autoplay prevented, will play on user gesture.');
+        });
+      } catch(e) {
+        console.warn('Audio play error', e);
+      }
+    }
+
+    // volver al mapa
+    document.getElementById('backBtn').addEventListener('click', () => {
+      document.getElementById('detail-screen').classList.add('hidden');
+      document.getElementById('map-screen').classList.remove('hidden');
+      audio.pause();
+    });
+
+    // next / prev
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      currentIndex = (currentIndex - 1 + data.length) % data.length;
+      openDetail(currentIndex);
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      currentIndex = (currentIndex + 1) % data.length;
+      openDetail(currentIndex);
+    });
+
+ 
+
+    // in case audio autoplay blocked, resume on first user touch
+    let firstTouch = true;
+    window.addEventListener('pointerdown', () => {
+      if(firstTouch){
+        firstTouch = false;
+        if(audio.src && audio.paused){
+          audio.play().catch(() => {});
+        }
+      }
+    });
+
+    function attachHandlers() {
+      // Handlers are already attached in the code above
+    }
+
+    // init app
+    init();
+  </script>
+</body>
+</html>
